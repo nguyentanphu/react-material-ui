@@ -2,10 +2,11 @@ import {
   AppBar,
   Button,
   makeStyles,
+  Menu,
+  MenuItem,
   Tab,
   Tabs,
   Toolbar,
-  Typography,
   useScrollTrigger,
 } from '@material-ui/core';
 import React, { ChangeEvent, useEffect, useState } from 'react';
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
   logoButton: {
     padding: 0,
-    background: 'transparent'
+    background: 'transparent',
   },
   tabContainer: {
     marginLeft: 'auto',
@@ -64,6 +65,7 @@ export default function Header(props: Props) {
   const [tabValue, setTabValue] = useState(0);
   const location = useLocation();
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   useEffect(() => {
     const currentRoute = routes.find((r) => r.path === location.pathname);
     if (currentRoute && currentRoute.tabIndex && currentRoute.tabIndex !== tabValue) {
@@ -76,9 +78,17 @@ export default function Header(props: Props) {
   };
 
   const logoClicked = () => {
-    const homeRoutes = routes.find(r => r.path === '/')!;
+    const homeRoutes = routes.find((r) => r.path === '/')!;
     setTabValue(homeRoutes.tabIndex!);
-  }
+  };
+
+  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const classes = useStyles();
   return (
@@ -86,12 +96,18 @@ export default function Header(props: Props) {
       <ElevationScroll {...props}>
         <AppBar>
           <Toolbar disableGutters>
-            <Button onClick={logoClicked} disableRipple className={classes.logoButton} component={Link} to="/">
+            <Button
+              onClick={logoClicked}
+              disableRipple
+              className={classes.logoButton}
+              component={Link}
+              to='/'
+            >
               <img alt='Company logo' src={logo} className={classes.logo} />
             </Button>
-            <Tabs value={tabValue} onChange={tabChanged} className={classes.tabContainer}>
+            <Tabs value={tabValue} className={classes.tabContainer} onChange={tabChanged}>
               <Tab className={classes.tab} component={Link} to='/' label='Home'></Tab>
-              <Tab className={classes.tab} component={Link} to='/services' label='Services'></Tab>
+              <Tab className={classes.tab} component={Link} to='/services' label='Services' onMouseEnter={handleMenuOpen}></Tab>
               <Tab
                 className={classes.tab}
                 component={Link}
@@ -109,6 +125,11 @@ export default function Header(props: Props) {
             <Button variant='contained' color='secondary' className={classes.estimateButton}>
               Free estimate
             </Button>
+            <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} MenuListProps={{onMouseLeave: handleMenuClose}}>
+              <MenuItem onClick={handleMenuClose}>Custom software</MenuItem>
+              <MenuItem onClick={handleMenuClose}>Mobile apps</MenuItem>
+              <MenuItem onClick={handleMenuClose}>Website development</MenuItem>
+            </Menu>
           </Toolbar>
         </AppBar>
       </ElevationScroll>

@@ -1,15 +1,19 @@
 import {
   AppBar,
   Button,
+  ClickAwayListener,
+  Grow,
   makeStyles,
-  Menu,
   MenuItem,
+  MenuList,
+  Paper,
+  Popper,
   Tab,
   Tabs,
   Toolbar,
   useScrollTrigger,
 } from '@material-ui/core';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.svg';
 import { routes } from '../../routes';
@@ -59,13 +63,16 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '25px',
     marginRight: '25px',
   },
+  menu: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white,
+  },
 }));
 
 export default function Header(props: Props) {
   const [tabValue, setTabValue] = useState(0);
   const location = useLocation();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   useEffect(() => {
     const currentRoute = routes.find((r) => r.path === location.pathname);
     if (currentRoute && currentRoute.tabIndex && currentRoute.tabIndex !== tabValue) {
@@ -82,12 +89,15 @@ export default function Header(props: Props) {
     setTabValue(homeRoutes.tabIndex!);
   };
 
-  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<any>(null);
+
+  const handleOpen = () => {
+    setOpen(true);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const classes = useStyles();
@@ -105,9 +115,22 @@ export default function Header(props: Props) {
             >
               <img alt='Company logo' src={logo} className={classes.logo} />
             </Button>
-            <Tabs value={tabValue} className={classes.tabContainer} onChange={tabChanged}>
+            <Tabs
+              value={tabValue}
+              className={classes.tabContainer}
+              onChange={tabChanged}
+              indicatorColor='primary'
+            >
               <Tab className={classes.tab} component={Link} to='/' label='Home'></Tab>
-              <Tab className={classes.tab} component={Link} to='/services' label='Services' onMouseEnter={handleMenuOpen}></Tab>
+              <Tab
+                ref={anchorRef}
+                className={classes.tab}
+                component={Link}
+                to='/services'
+                label='Services'
+                onMouseOver={handleOpen}
+                onMouseLeave={handleClose}
+              ></Tab>
               <Tab
                 className={classes.tab}
                 component={Link}
@@ -125,11 +148,36 @@ export default function Header(props: Props) {
             <Button variant='contained' color='secondary' className={classes.estimateButton}>
               Free estimate
             </Button>
-            <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} MenuListProps={{onMouseLeave: handleMenuClose}}>
-              <MenuItem onClick={handleMenuClose}>Custom software</MenuItem>
-              <MenuItem onClick={handleMenuClose}>Mobile apps</MenuItem>
-              <MenuItem onClick={handleMenuClose}>Website development</MenuItem>
-            </Menu>
+            <Popper
+              open={open}
+              anchorEl={anchorRef.current}
+              role={undefined}
+              placement='bottom-start'
+              transition
+              disablePortal
+            >
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{
+                    transformOrigin: 'top left',
+                  }}
+                >
+                  <Paper classes={{ root: classes.menu }} elevation={0}>
+                    <MenuList
+                      disablePadding
+                      id='menu-list-grow'
+                      onMouseOver={handleOpen}
+                      onMouseLeave={handleClose}
+                    >
+                      <MenuItem onClick={handleClose}>Custom Software</MenuItem>
+                      <MenuItem onClick={handleClose}>Mobile App Development</MenuItem>
+                      <MenuItem onClick={handleClose}>Website Development</MenuItem>
+                    </MenuList>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
           </Toolbar>
         </AppBar>
       </ElevationScroll>

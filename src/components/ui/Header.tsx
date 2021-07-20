@@ -1,7 +1,6 @@
 import {
   AppBar,
   Button,
-  ClickAwayListener,
   Grow,
   makeStyles,
   MenuItem,
@@ -16,7 +15,7 @@ import {
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.svg';
-import { routes } from '../../routes';
+import { Route, routes } from '../../routes';
 
 interface Props {
   children?: React.ReactElement;
@@ -67,16 +66,30 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white,
   },
+  menuItem: {
+    fontSize: '1rem',
+    fontWeight: 500,
+    opacity: 0.7,
+    '&:hover': {
+      opacity: 1,
+    },
+  },
 }));
 
 export default function Header(props: Props) {
   const [tabValue, setTabValue] = useState(0);
+  const [subMenuValue, setSubMenuValue] = useState<null | number>(null);
   const location = useLocation();
 
   useEffect(() => {
     const currentRoute = routes.find((r) => r.path === location.pathname);
-    if (currentRoute && currentRoute.tabIndex && currentRoute.tabIndex !== tabValue) {
-      setTabValue(currentRoute.tabIndex);
+    if (currentRoute) {
+      if (currentRoute.tabIndex && currentRoute.tabIndex !== tabValue) {
+        setTabValue(currentRoute.tabIndex);
+      }
+      if (currentRoute.subTabIndex || currentRoute.subTabIndex === 0) {
+        setSubMenuValue(currentRoute.subTabIndex);
+      }
     }
   }, [location.pathname, tabValue]);
 
@@ -99,6 +112,14 @@ export default function Header(props: Props) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const subMenuItemClicked = (subRoute: Route) => {
+    handleClose();
+    setSubMenuValue(subRoute.subTabIndex!);
+    setTabValue(subRoute.tabIndex!);
+  };
+
+  const servicesSubmenu = routes.filter((r) => r.tabIndex === 1 && r.subTabIndex != null);
 
   const classes = useStyles();
   return (
@@ -163,16 +184,24 @@ export default function Header(props: Props) {
                     transformOrigin: 'top left',
                   }}
                 >
-                  <Paper classes={{ root: classes.menu }} elevation={0}>
+                  <Paper classes={{ root: classes.menu }} elevation={0} square>
                     <MenuList
                       disablePadding
                       id='menu-list-grow'
                       onMouseOver={handleOpen}
                       onMouseLeave={handleClose}
                     >
-                      <MenuItem onClick={handleClose}>Custom Software</MenuItem>
-                      <MenuItem onClick={handleClose}>Mobile App Development</MenuItem>
-                      <MenuItem onClick={handleClose}>Website Development</MenuItem>
+                      {servicesSubmenu.map((m) => (
+                        <MenuItem
+                          component={Link}
+                          to={m.path}
+                          selected={m.subTabIndex === subMenuValue}
+                          classes={{ root: classes.menuItem }}
+                          onClick={() => subMenuItemClicked(m)}
+                        >
+                          {m.name}
+                        </MenuItem>
+                      ))}
                     </MenuList>
                   </Paper>
                 </Grow>

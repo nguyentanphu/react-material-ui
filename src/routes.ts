@@ -5,10 +5,12 @@ import AboutUs from './components/pages/AboutUs';
 import ContactUs from './components/pages/ContactUs';
 import CustomSoftware from './components/pages/CustomSoftware';
 import MobileApps from './components/pages/MobileApps';
+import WebsitesDevelopment from './components/pages/WebsitesDevelopment';
 
-interface Route {
+export interface Route {
   component: () => JSX.Element;
   tabIndex?: number;
+  subTabIndex?: number;
   path: string;
   name: string;
 }
@@ -27,16 +29,25 @@ export const routes: Route[] = [
     component: Services
   },
   {
-    name: 'Custom software',
+    name: 'Custom Software',
     tabIndex: 1,
+    subTabIndex: 0,
     path: '/custom-software',
     component: CustomSoftware
   },
   {
-    name: 'Mobile apps',
+    name: 'Mobile Apps Development',
     tabIndex: 1,
-    path: '/mobile-apps',
+    subTabIndex: 1,
+    path: '/mobile-apps-development',
     component: MobileApps
+  },
+  {
+    name: 'Websites Development',
+    tabIndex: 1,
+    subTabIndex: 2,
+    path: '/websites-development',
+    component: WebsitesDevelopment
   },
   {
     name: 'The revolution',

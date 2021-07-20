@@ -6,16 +6,17 @@ import ContactUs from './components/pages/ContactUs';
 import CustomSoftware from './components/pages/CustomSoftware';
 import MobileApps from './components/pages/MobileApps';
 import WebsitesDevelopment from './components/pages/WebsitesDevelopment';
+import Estimate from './components/pages/Estimate';
 
-export interface Route {
+export interface AppRoute {
   component: () => JSX.Element;
-  tabIndex?: number;
+  tabIndex: number;
   subTabIndex?: number;
   path: string;
   name: string;
 }
 
-export const routes: Route[] = [
+export const routes: AppRoute[] = [
   {
     name: 'Home',
     tabIndex: 0,
@@ -69,7 +70,8 @@ export const routes: Route[] = [
   },
   {
     name: 'Free estimate',
+    tabIndex: 5,
     path: '/estimate',
-    component: ContactUs
+    component: Estimate
   },
 ]

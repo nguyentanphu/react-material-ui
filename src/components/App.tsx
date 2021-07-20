@@ -11,8 +11,8 @@ function App() {
       <BrowserRouter>
         <Header />
         <Switch>
-          {routes.map(r => (
-            <Route exact path={r.path} component={r.component}/>
+          {routes.map((r, i) => (
+            <Route key={i} exact path={r.path} component={r.component}/>
           ))}
         </Switch>
       </BrowserRouter>

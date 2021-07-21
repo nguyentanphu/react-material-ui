@@ -60,8 +60,6 @@ export default function DesktopTabs() {
     setTabValue(value);
   };
 
-  
-
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<any>(null);
 
@@ -112,6 +110,7 @@ export default function DesktopTabs() {
         placement='bottom-start'
         transition
         disablePortal
+        keepMounted
       >
         {({ TransitionProps, placement }) => (
           <Grow
@@ -127,8 +126,9 @@ export default function DesktopTabs() {
                 onMouseOver={handleOpen}
                 onMouseLeave={handleClose}
               >
-                {servicesSubmenu.map((m) => (
+                {servicesSubmenu.map((m, i) => (
                   <MenuItem
+                    key={i}
                     component={Link}
                     to={m.path}
                     selected={m.subTabIndex === subMenuValue}
